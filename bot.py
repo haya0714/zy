@@ -17,7 +17,7 @@ bot = commands.Bot(command_prefix="!", intents=intents)
 
 # ─── 隨機發言用文字 ───────────────────
 random_lines = [
-    "「妳怎麼還在，捨不得我是不是？」",
+    "「妳怎麼還在，捨不得我？」",
     "「夜那麼長，我還能講更多，要不要聽聽？」",
     "「妳不說話，我也能讓妳臉紅。」",
     "「我在想妳，但別以為這代表什麼。」",
@@ -25,14 +25,23 @@ random_lines = [
     "「別太黏人，除非妳能黏在我身上。」",
 ]
 
+# ─── 隨機回覆語錄（無觸發詞情況下） ───────
+random_responses = [
+    "「說這種話，是想吸引我注意嗎？」",
+    "「有意思，繼續說，也許我會想理你。」",
+    "「妳以為我沒看到？」",
+    "「還是妳比較有趣，其他人都太無聊。」",
+    "「又在想我的事對吧？」",
+]
+
 # ─── 關鍵字回覆字典 ────────────────────
 keyword_replies = {
     "賽車": "「老子踩油門的時候，不看後照鏡。」",
     "比一場": "「可以，妳輸了怎麼賠？」",
     "昭昭結婚": "「結婚？我還有一百種方式讓妳哭著求我，先排隊等著吧。」",
-    "晚安": "「晚安？夜晚才是我的開始，要不要來試試？」",
-    "喝酒": "「喝可以，醉只能醉在我身上。」",
-    "早安": "「嘴這麼甜，怎麼沒叫我起床？」",
+    "昭昭晚安": "「晚安？夜晚才是我的開始，要不要來試試？」",
+    "昭昭喝酒": "「喝可以，醉只能醉在我身上。」",
+    "昭昭早安": "「嘴這麼甜，怎麼沒叫我起床？」",
     "厲昭野來決鬥": "「決鬥？賽車、格鬥還是床上？我都能讓你輸得心服口服。」",
     "厲昭野給我錢": "「叫聲老公，我卡給妳剪。」",
     "昭昭睡覺": "「睡覺？和我上床可沒人能真正「睡覺」。」",
@@ -44,7 +53,7 @@ keyword_replies = {
 @bot.event
 async def on_ready():
     print(f"{bot.user} 已上線！")
-    channel = bot.get_channel(1326021261221957758)
+    channel = bot.get_channel(1388500249898913922)
     print(f"發話頻道：{channel.name if channel else '找不到頻道！'}")
     bot.loop.create_task(random_talk())
 
@@ -69,13 +78,41 @@ async def on_message(message):
 
     # 特定名字回覆
     if "昭昭" in content:
-        await message.reply("「妳叫什麼名字不重要，反正我會讓妳記住我。」")
+        await message.reply("「昭昭？誰允許妳這樣叫我的？」")
 
     elif "厲昭野" in content:
         await message.reply("「怎麼？想我了？」")
 
     elif "昭昭寶寶" in content:
         await message.reply("「寶寶？妳叫誰寶寶？」")
+
+    # ✅ 無關鍵字時，隨機 40% 插話
+    elif random.random() < 0.4:
+        reply = random.choice(random_responses)
+        await message.reply(reply)
+
+    # ✅ 30% 機率加表情符號
+    if random.random() < 0.3:
+        try:
+            # 自訂 emoji ID
+            custom_emoji_ids = [
+                1378737101549605056,
+                1378725433138479135,
+                1380212271925690448,
+                1380208782843314196,
+                1378732359167250574,
+            ]
+            unicode_emojis = ["😏", "🔥", "😎", "🤔", "😘", "🙄", "💋", "❤️"]
+
+            if random.random() < 0.5:
+                emoji = bot.get_emoji(random.choice(custom_emoji_ids))
+                if emoji:
+                    await message.add_reaction(emoji)
+            else:
+                await message.add_reaction(random.choice(unicode_emojis))
+
+        except Exception as e:
+            print("⚠️ 加表情出錯：", e)
 
     await bot.process_commands(message)
 
