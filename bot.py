@@ -141,5 +141,21 @@ async def random_talk():
             print("發言錯誤：", e)
             traceback.print_exc()
 
+# ─── Flask 健康檢查用 ────────────────────────
+from flask import Flask
+from threading import Thread
+
+app = Flask(__name__)
+
+@app.route("/")
+def home():
+    return "Bot is alive."
+
+def run_web():
+    app.run(host="0.0.0.0", port=8080)
+
+# ✅ 啟動 Flask Web 服務（用來保持 Render 喚醒）
+Thread(target=run_web).start()
+
 # ─── 啟動 Discord Bot ─────────────────
 bot.run(discord_token)
