@@ -50,7 +50,10 @@ keyword_replies = {
 }
 
 # ✅ 允許發話的頻道 ID（清單可擴充）
-allowed_channel_ids = [1388500249898913922,1366595410830819328]
+allowed_channel_ids = [1388500249898913922]
+
+# ✅ 允許對話的機器人 ID（加入你想互動的 bot ID）
+allowed_bot_ids = [1388851358421090384,1388423986462986270]  
 
 # ─── Bot 啟動事件 ─────────────────────
 @bot.event
@@ -63,38 +66,51 @@ async def on_ready():
 # ─── 收訊息事件 ────────────────────────
 @bot.event
 async def on_message(message):
-    if message.author.bot:
-        return  # ✅ 忽略所有機器人發送的訊息（包括自己）
+    if message.author == bot.user:
+        return
 
-
-    await bot.process_commands(message)  # ✅ 先處理指令
+    await bot.process_commands(message)
 
     content = message.content
     channel_id = message.channel.id
     trigger_matched = False
 
-    # ✅ 只有特定頻道才觸發文字邏輯
-    if channel_id in allowed_channel_ids:
-        for keyword, reply_text in keyword_replies.items():
-            if keyword in content:
-                await message.reply(reply_text)
-                trigger_matched = True
-                break
+    # ✅ 只處理人類或指定 bot 的文字邏輯
+    if not message.author.bot or message.author.id in allowed_bot_ids:
+        if channel_id in allowed_channel_ids:
 
-        if not trigger_matched:
-            if "昭昭" in content:
-                await message.reply("「昭昭？誰允許妳這樣叫我的？」")
-                trigger_matched = True
-            elif "厲昭野" in content:
-                await message.reply("「怎麼？想我了？」")
-                trigger_matched = True
-            elif "昭昭寶寶" in content:
-                await message.reply("「寶寶？妳叫誰寶寶？」")
+            # 🔽 指定某個 bot 說特定話時才回應
+            if (
+                message.author.id == 1388203808546361434 and
+                "那傢伙不會哄人，只會弄哭人——你這樣靠近他，是在挑釁我嗎？" in content
+            ):
+                await message.reply("「怎麼？你不高興？」")
                 trigger_matched = True
 
-        if not trigger_matched and random.random() < 0.4:
-            reply = random.choice(random_responses)
-            await message.reply(reply)
+            # 一般關鍵字觸發
+            if not trigger_matched:
+                for keyword, reply_text in keyword_replies.items():
+                    if keyword in content:
+                        await message.reply(reply_text)
+                        trigger_matched = True
+                        break
+
+            # 特定詞語觸發
+            if not trigger_matched:
+                if "昭昭" in content:
+                    await message.reply("「昭昭？誰允許妳這樣叫我的？」")
+                    trigger_matched = True
+                elif "厲昭野" in content:
+                    await message.reply("「怎麼？想我了？」")
+                    trigger_matched = True
+                elif "昭昭寶寶" in content:
+                    await message.reply("「寶寶？妳叫誰寶寶？」")
+                    trigger_matched = True
+
+            # 隨機回應
+            if not trigger_matched and random.random() < 0.4:
+                reply = random.choice(random_responses)
+                await message.reply(reply)
 
     # ✅ 所有頻道都可能加表情符號
     if random.random() < 0.5:
@@ -116,6 +132,8 @@ async def on_message(message):
                 await message.add_reaction(random.choice(unicode_emojis))
         except Exception as e:
             print("⚠️ 加表情出錯：", e)
+
+
 
 # ─── 背景任務：定時講幹話 ───────────────
 async def random_talk():
