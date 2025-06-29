@@ -63,38 +63,38 @@ async def on_message(message):
     if message.author == bot.user:
         return
 
+    await bot.process_commands(message)  # ✅ 先處理指令，避免跟自訂邏輯衝突
+
     content = message.content
+    trigger_matched = False  # ✅ 增加觸發旗標
 
     # 關鍵字回覆
     for keyword, reply_text in keyword_replies.items():
         if keyword in content:
-            try:
-                await message.reply(reply_text)
-                return
-            except Exception as e:
-                await message.channel.send("出錯了，等下再試。")
-                traceback.print_exc()
-                return
+            await message.reply(reply_text)
+            trigger_matched = True
+            break
 
-    # 特定名字回覆
-    if "昭昭" in content:
-        await message.reply("「昭昭？誰允許妳這樣叫我的？」")
+    # 特定名字回覆（只有當前面沒觸發）
+    if not trigger_matched:
+        if "昭昭" in content:
+            await message.reply("「昭昭？誰允許妳這樣叫我的？」")
+            trigger_matched = True
+        elif "厲昭野" in content:
+            await message.reply("「怎麼？想我了？」")
+            trigger_matched = True
+        elif "昭昭寶寶" in content:
+            await message.reply("「寶寶？妳叫誰寶寶？」")
+            trigger_matched = True
 
-    elif "厲昭野" in content:
-        await message.reply("「怎麼？想我了？」")
-
-    elif "昭昭寶寶" in content:
-        await message.reply("「寶寶？妳叫誰寶寶？」")
-
-    # ✅ 無關鍵字時，隨機 40% 插話
-    elif random.random() < 0.4:
+    # 無關鍵字時，隨機 40% 插話
+    if not trigger_matched and random.random() < 0.4:
         reply = random.choice(random_responses)
         await message.reply(reply)
 
-    # ✅ 30% 機率加表情符號
-    if random.random() < 0.3:
+    # 50% 機率加表情符號（可獨立執行）
+    if random.random() < 0.5:
         try:
-            # 自訂 emoji ID
             custom_emoji_ids = [
                 1378737101549605056,
                 1378725433138479135,
@@ -110,11 +110,12 @@ async def on_message(message):
                     await message.add_reaction(emoji)
             else:
                 await message.add_reaction(random.choice(unicode_emojis))
-
         except Exception as e:
             print("⚠️ 加表情出錯：", e)
 
+
     await bot.process_commands(message)
+
 
 # ─── 背景任務：定時講幹話 ───────────────
 async def random_talk():
