@@ -76,16 +76,21 @@ async def on_message(message):
     trigger_matched = False
 
     # ✅ 只處理人類或指定 bot 的文字邏輯
-    if not message.author.bot or message.author.id in allowed_bot_ids:
-        if channel_id in allowed_channel_ids:
+if not message.author.bot or message.author.id in allowed_bot_ids:
+    if channel_id in allowed_channel_ids:
 
-            # 🔽 指定某個 bot 說特定話時才回應
-            if (
-                message.author.id == 1388203808546361434 and
-                "那傢伙不會哄人，只會弄哭人——你這樣靠近他，是在挑釁我嗎？" in content
-            ):
-                await message.reply("「怎麼？你不高興？」")
-                trigger_matched = True
+        # 🔽 指定某個 bot 說特定話時才回應
+        if (
+            message.author.id == 1388203808546361434 and
+            any(phrase in content for phrase in [
+                "那傢伙不會哄人，只會弄哭人——你這樣靠近他，是在挑釁我嗎？",
+                "……他對你說什麼了？",
+                "昭野那種脾氣，你惹得起嗎？還是……你是想讓我學他狠一點？"
+            ])
+        ):
+            await message.reply("「怎麼？你不高興？」")
+            trigger_matched = True
+
 
             # 一般關鍵字觸發
             if not trigger_matched:
