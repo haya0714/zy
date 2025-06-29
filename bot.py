@@ -56,15 +56,16 @@ allowed_channel_ids = [1388500249898913922,1366595410830819328]
 @bot.event
 async def on_ready():
     print(f"{bot.user} 已上線！")
-    channel = bot.get_channel(1388500249898913922,1366595410830819328)
+    channel = bot.get_channel(1388500249898913922)
     print(f"發話頻道：{channel.name if channel else '找不到頻道！'}")
     bot.loop.create_task(random_talk())
 
 # ─── 收訊息事件 ────────────────────────
 @bot.event
 async def on_message(message):
-    if message.author == bot.user:
-        return
+    if message.author.bot:
+        return  # ✅ 忽略所有機器人發送的訊息（包括自己）
+
 
     await bot.process_commands(message)  # ✅ 先處理指令
 
