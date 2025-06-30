@@ -87,7 +87,7 @@ keyword_replies = {
     ]
 }
 
-allowed_channel_ids = [1388500249898913922]
+allowed_channel_ids = [1388500249898913922, 1355076418681176177]
 allowed_bot_ids = [1388851358421090384, 1388423986462986270]
 
 @bot.event
