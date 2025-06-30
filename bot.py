@@ -95,7 +95,6 @@ async def on_ready():
     print(f"{bot.user} 已上線！")
     channel = bot.get_channel(1388500249898913922)
     print(f"發話頻道：{channel.name if channel else '找不到頻道！'}")
-    bot.loop.create_task(random_talk())
 
 @bot.event
 async def on_message(message):
