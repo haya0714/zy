@@ -15,8 +15,13 @@ intents = discord.Intents.default()
 intents.message_content = True
 bot = commands.Bot(command_prefix="!", intents=intents)
 
-# ─── 隨機發言用文字 ───────────────────
-random_lines = [
+# ─── 隨機回覆語錄（無觸發詞情況下） ───────
+random_responses = [
+    "「說這種話，是想吸引我注意嗎？」",
+    "「有意思，繼續說，也許我會想理你。」",
+    "「妳以為我沒看到？」",
+    "「還是妳比較有趣，其他人都太無聊。」",
+    "「又在想我的事對吧？」",
     "「妳怎麼還在，捨不得我？」",
     "「夜那麼長，我還能講更多，要不要聽聽？」",
     "「妳不說話，我也能讓妳臉紅。」",
@@ -25,35 +30,66 @@ random_lines = [
     "「別太黏人，除非妳能黏在我身上。」",
 ]
 
-# ─── 隨機回覆語錄（無觸發詞情況下） ───────
-random_responses = [
-    "「說這種話，是想吸引我注意嗎？」",
-    "「有意思，繼續說，也許我會想理你。」",
-    "「妳以為我沒看到？」",
-    "「還是妳比較有趣，其他人都太無聊。」",
-    "「又在想我的事對吧？」",
-]
-
 # ─── 關鍵字回覆字典 ────────────────────
 keyword_replies = {
-    "賽車": "「老子踩油門的時候，不看後照鏡。」",
-    "比一場": "「可以，妳輸了怎麼賠？」",
-    "昭昭結婚": "「結婚？我還有一百種方式讓妳哭著求我，先排隊等著吧。」",
-    "昭昭晚安": "「晚安？夜晚才是我的開始，要不要來試試？」",
-    "昭昭喝酒": "「喝可以，醉只能醉在我身上。」",
-    "昭昭早安": "「嘴這麼甜，怎麼沒叫我起床？」",
-    "厲昭野來決鬥": "「決鬥？賽車、格鬥還是床上？我都能讓你輸得心服口服。」",
-    "厲昭野給我錢": "「叫聲老公，我卡給妳剪。」",
-    "昭昭睡覺": "「睡覺？和我上床可沒人能真正「睡覺」。」",
-    "厲昭野教的": "「什麼都往我身上推？有種跟我學到底。」",
-    "昭昭閉嘴": "「讓我閉嘴？試試用妳的嘴來堵我的，保證有效。」",
+    "賽車": [
+        "「老子踩油門的時候，不看後照鏡。」",
+        "「我不飆車，我飆的是心跳——尤其是妳的。」"
+    ],
+    "比一場": [
+        "「可以，妳輸了怎麼賠？」",
+        "「敢開口挑戰，就別怕被我玩壞。」",
+        "「比一場？妳確定不是在找藉口讓我碰妳？」"
+    ],
+    "昭昭結婚": [
+        "「結婚？我還有一百種方式讓妳哭著求我，先排隊等著吧。」",
+        "「想綁住我？那就先準備好被我壓著過一輩子。」",
+        "「結婚？我不是蓋章的，是蓋妳的。」"
+    ],
+    "昭昭晚安": [
+        "「晚安？夜晚才是我的開始，要不要來試試？」",
+        "「說晚安可以，但妳要保證今晚只夢到我。」",
+        "「這種聲音說晚安，是想我帶妳進夢還是進房？」"
+    ],
+    "昭昭喝酒": [
+        "「喝可以，醉只能醉在我身上。」",
+        "「別碰太多，除非是碰我。」"
+    ],
+    "昭昭早安": [
+        "「嘴這麼甜，怎麼沒叫我起床？」",
+        "「一醒來就想到我？我該獎勵妳黏著我一整天。」"
+    ],
+    "厲昭野來決鬥": [
+        "「決鬥？賽車、格鬥還是床上？我都能讓你輸得心服口服。」",
+        "「輸了就上，別說我沒提醒。」",
+        "「別廢話，直接上。」"
+    ],
+    "厲昭野給我錢": [
+        "「叫聲老公，我卡給妳刷。」",
+        "「錢可以給，但妳得用身體簽收。」",
+        "「先說好，我給的，可不只鈔票。」"
+    ],
+    "昭昭睡覺": [
+        "「睡覺？和我上床可沒人能真正『睡覺』。」",
+        "「想睡？我讓妳連夢裡都紅著臉。」",
+        "「今晚不許關燈，我要看妳睡到臉紅耳赤。」"
+    ],
+    "厲昭野教的": [
+        "「什麼都往我身上推？有種跟我學到底。」",
+        "「是我教的？那妳還不來複習一遍？」"
+    ],
+    "昭昭閉嘴": [
+        "「讓我閉嘴？試試用妳的嘴來堵我的，保證有效。」",
+        "「要我安靜？得先讓我滿意才行。」",
+        "「想堵我的嘴？那妳最好是有本事讓它忙個夠。」"
+    ]
 }
 
 # ✅ 允許發話的頻道 ID（清單可擴充）
 allowed_channel_ids = [1388500249898913922]
 
 # ✅ 允許對話的機器人 ID（加入你想互動的 bot ID）
-allowed_bot_ids = [1388851358421090384,1388423986462986270]  
+allowed_bot_ids = [1388851358421090384, 1388423986462986270]
 
 # ─── Bot 啟動事件 ─────────────────────
 @bot.event
@@ -75,7 +111,6 @@ async def on_message(message):
     channel_id = message.channel.id
     trigger_matched = False
 
-    # ✅ 處理指定 bot 的特定對話
     if message.author.id == 1388203808546361434:
         if channel_id in allowed_channel_ids and any(phrase in content for phrase in [
             "那傢伙不會哄人，只會弄哭人——你這樣靠近他，是在挑釁我嗎？",
@@ -83,32 +118,80 @@ async def on_message(message):
             "昭野那種脾氣，你惹得起嗎？還是……你是想讓我學他狠一點？"
         ]):
             await message.reply("「怎麼？你不高興？」")
-            return  # ✅ 不繼續下方人類邏輯，避免重複回覆
+            return
 
-    # ✅ 處理「人類用戶」訊息邏輯
     if not message.author.bot and channel_id in allowed_channel_ids:
-        for keyword, reply_text in keyword_replies.items():
+        if "生日快樂" in content and message.mentions:
+            mention_name = message.mentions[0].mention
+            birthday_intros = [
+                f"{mention_name} 今天是妳的生日？——好吧，我偶爾也會給點『例外』。",
+                f"{mention_name}，想讓我陪你過生日？不早說。",
+                f"哼，{mention_name} 今天生日？看在你乖的份上——生日快樂。",
+                f"「{mention_name}……生日？哼，看來還是得給你點關注。」",
+            ]
+            birthday_lines = [
+                f"「生日快樂，{mention_name}。」",
+                f"「別太感動——生日快樂。」",
+                f"「下一次生日，記得還是找我唱。」",
+            ]
+            await message.channel.send(random.choice(birthday_intros))
+            await asyncio.sleep(1)
+            await message.channel.send(random.choice(birthday_lines))
+            await asyncio.sleep(1)
+            await message.channel.send(
+                f"「Happy birthday to you...」\n"
+                f"「Happy birthday to you...」\n"
+                f"「Happy birthday dear {mention_name}...」\n"
+                f"「Happy birthday to you——」"
+            )
+            return
+
+        if "禮物呢" in content:
+            gift_lines = [
+                "「禮物？妳想要哪種——要我今晚不亂碰妳？還是……乾脆讓我幫妳過個記一輩子的生日？」",
+                "「不管怎樣，今年，妳得記住我。因為妳的生日，老子親自唱過歌給妳聽。」",
+                "今天沒準備什麼禮物，但我這個人，本來就算是一種犒賞。",
+                "妳敢問禮物？我人站這，就是最難得的禮物了。",
+            ]
+            await message.channel.send(random.choice(gift_lines))
+            return
+
+        for keyword, reply_list in keyword_replies.items():
             if keyword in content:
-                await message.reply(reply_text)
+                await message.reply(random.choice(reply_list))
                 trigger_matched = True
                 break
 
         if not trigger_matched:
             if "昭昭" in content:
-                await message.reply("「昭昭？誰允許妳這樣叫我的？」")
+                replies = [
+                    "「昭昭？誰允許妳這樣叫我的？」",
+                    "「聲音這麼軟，我怕忍不住想親下去。」",
+                    "「叫得這麼親密，是想讓我對妳也親密點？」"
+                ]
+                await message.reply(random.choice(replies))
                 trigger_matched = True
             elif "厲昭野" in content:
-                await message.reply("「怎麼？想我了？」")
+                replies = [
+                    "「怎麼？想我了？」",
+                    "「喊我名字之前，最好想好後果。」",
+                    "「叫得這麼甜，是怕我不來？」"
+                ]
+                await message.reply(random.choice(replies))
                 trigger_matched = True
             elif "昭昭寶寶" in content:
-                await message.reply("「寶寶？妳叫誰寶寶？」")
+                replies = [
+                    "「寶寶？妳叫誰寶寶？」",
+                    "「我不是寶寶，是妳今晚的麻煩。」",
+                    "「敢叫我寶寶，就別想今晚好好睡。」"
+                ]
+                await message.reply(random.choice(replies))
                 trigger_matched = True
 
         if not trigger_matched and random.random() < 0.4:
             reply = random.choice(random_responses)
             await message.reply(reply)
 
-    # ✅ 所有訊息都可能加表情
     if random.random() < 0.5:
         try:
             custom_emoji_ids = [
@@ -129,14 +212,10 @@ async def on_message(message):
         except Exception as e:
             print("⚠️ 加表情出錯：", e)
 
-
-
-
-
 # ─── 背景任務：定時講幹話 ───────────────
 async def random_talk():
     await bot.wait_until_ready()
-    channel = bot.get_channel(1388500249898913922,1366595410830819328)
+    channel = bot.get_channel(1388500249898913922)
 
     if not channel:
         print("❌ 找不到頻道，請確認頻道 ID 是否正確")
