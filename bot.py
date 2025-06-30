@@ -184,11 +184,11 @@ async def on_message(message):
                 await message.reply(random.choice(replies))
                 trigger_matched = True
 
-        if not trigger_matched and random.random() < 0.4:
+        if not trigger_matched and random.random() < 0.3:
             reply = random.choice(random_responses)
             await message.reply(reply)
 
-    if random.random() < 0.5:
+    if random.random() < 0.4:
         try:
             custom_emoji_ids = [
                 1378737101549605056,
@@ -199,7 +199,7 @@ async def on_message(message):
             ]
             unicode_emojis = ["😏", "🔥", "😎", "🤔", "😘", "🙄", "💋", "❤️"]
 
-            if random.random() < 0.5:
+            if random.random() < 0.4:
                 emoji = bot.get_emoji(random.choice(custom_emoji_ids))
                 if emoji:
                     await message.add_reaction(emoji)
