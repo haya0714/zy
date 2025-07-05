@@ -1,6 +1,0 @@
-envVars:
-  - key: OPENROUTER_API_KEY
-    value: ${OPENROUTER_API_KEY}
-
-  - key: DISCORD_TOKEN
-    value: ${DISCORD_TOKEN}
