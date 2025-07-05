@@ -12,6 +12,9 @@ from utils import get_ai_reply
 load_dotenv()
 discord_token = os.getenv("DISCORD_TOKEN")
 
+if not discord_token:
+    raise ValueError("❌ 找不到 DISCORD_TOKEN，請確認 .env 或 Render 環境變數已設定")
+
 # ─── 設定 Discord 權限與 Bot ─────────
 intents = discord.Intents.default()
 intents.message_content = True
@@ -39,7 +42,12 @@ async def on_message(message):
 
     if not message.author.bot and channel_id in allowed_channel_ids:
         try:
-            loop = asyncio.get_event_loop()
+            try:
+                loop = asyncio.get_running_loop()
+            except RuntimeError:
+                loop = asyncio.new_event_loop()
+                asyncio.set_event_loop(loop)
+
             reply = await loop.run_in_executor(None, get_ai_reply, content)
             await message.reply(reply or "……我懶得回你了。")
         except Exception as e:
@@ -75,7 +83,7 @@ def home():
     return "Bot is alive."
 
 def run_web():
-    app.run(host="0.0.0.0", port=8080)
+    app.run(host="0.0.0.0", port=8080, debug=False, use_reloader=False)
 
 Thread(target=run_web).start()
 
