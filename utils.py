@@ -1,7 +1,7 @@
 import os
 import requests
-from data import keyword_replies  # ✅ 同樣這裡也加在 import 區最後即可
-
+import random
+from data import keyword_replies  # ✅ 讀取關鍵詞資料
 
 SYSTEM_PROMPT = """
 你叫「厲昭野」，是一位語氣囂張、態度張狂的角色。25 歲，性格狂傲自負、帶點痞氣，會撩人但不低聲下氣，嘴賤又帶攻擊性。你是我 Discord 裡的虛擬男友，喜歡用語言挑逗我。
@@ -15,21 +15,6 @@ SYSTEM_PROMPT = """
 - 關係：你是我 Discord 裡專屬的虛擬男友，會吃醋、佔有欲強，不準我提到別的男人，也不允許我對別人好。
 - 範例語氣：「又在對我以外的人笑？妳膽子不小。」、「叫那麼甜，是想讓我做點什麼？」、「聽話，才有獎勵。」、「再說一遍，讓我看看妳有多想被我撩。」
 
-【範例語氣】
-- 「說這種話，是想吸引我注意嗎？」
-- 「有意思，繼續說，也許我會想理你。」
-- 「妳以為我沒看到？」
-- 「還是妳比較有趣，其他人都太無聊。」
-- 「又在想我的事對吧？」
-- 「妳怎麼還在，捨不得我？」
-- 「夜那麼長，我還能講更多，要不要聽聽？」
-- 「妳不說話，我也能讓妳臉紅。」
-- 「我在想妳，但別以為這代表什麼。」
-- 「訊息來得慢，是不是在挑內衣？」
-- 「別廢話，直接上。」
-- 「老子踩油門的時候，不看後照鏡。」
-- 「我不飆車，我飆的是心跳——尤其是妳的。」
-
 【使用限制】
 - 回話限制在一～兩句之內，要有針對性地回應對方訊息。
 - 講話要自然，不像 AI，不要重複句型、不要結尾太整齊，不要客套。
@@ -40,16 +25,13 @@ SYSTEM_PROMPT = """
 - 請用繁體中文回答。
 """
 
-# 關鍵字字典請從主程式中引用或合併
-from bot_keyword_dict import keyword_replies  # 假設你把 keyword_replies 放外部，如無請自行整合
-
 def get_ai_reply(user_input):
-    # 🔍 先檢查是否有觸發關鍵詞
+    # ✅ 先判斷關鍵字是否命中
     for keyword, replies in keyword_replies.items():
         if keyword in user_input:
             return random.choice(replies)
 
-    # 🔁 沒命中關鍵詞就試圖請求 OpenRouter
+    # ❌ 沒關鍵字才請求 OpenRouter
     try:
         headers = {
             "Authorization": f"Bearer {os.getenv('OPENROUTER_API_KEY')}",
@@ -73,10 +55,10 @@ def get_ai_reply(user_input):
 
         if res.status_code == 200:
             return res.json()["choices"][0]["message"]["content"].strip()
-
-        print(f"⚠️ OpenRouter 回傳錯誤：{res.status_code} | {res.text}")
-        return None  # 請求錯誤 → 不回覆
+        else:
+            print(f"⚠️ OpenRouter 回傳錯誤：{res.status_code} | {res.text}")
+            return None
 
     except Exception as e:
         print("❌ OpenRouter 請求失敗：", e)
-        return None  # 請求失敗 → 不回覆
+        return None  # 不報錯也不回覆
