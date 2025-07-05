@@ -25,7 +25,6 @@ SYSTEM_PROMPT = """
 
 def get_ai_reply(user_input):
     try:
-        # 🔍 DEBUG 環境變數值
         key = os.getenv("OPENROUTER_API_KEY")
         print("🔐 DEBUG API KEY:", key)
 

@@ -4,7 +4,6 @@ import os
 import asyncio
 import random
 from dotenv import load_dotenv
-import traceback
 from flask import Flask
 from threading import Thread
 from utils import get_ai_reply
@@ -42,7 +41,7 @@ async def on_message(message):
         try:
             loop = asyncio.get_event_loop()
             reply = await loop.run_in_executor(None, get_ai_reply, content)
-            await message.reply(reply)
+            await message.reply(reply or "……我懶得回你了。")
         except Exception as e:
             print("❌ 語言模型回覆錯誤：", e)
             await message.reply("……我懶得回你了。")
