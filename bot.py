@@ -7,6 +7,10 @@ from dotenv import load_dotenv
 import traceback
 from flask import Flask
 from threading import Thread
+import requests
+
+from data import keyword_replies  # ✅ 加在這裡，其他 import 之後即可
+
 
 # ─── 載入環境變數 ────────────────────
 load_dotenv()
