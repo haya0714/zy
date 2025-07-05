@@ -1,11 +1,5 @@
-services:
-  - type: web
-    name: discord-bot
-    env: python
-    buildCommand: ""
-    startCommand: "python bot.py"
-    envVars:
-      - key: OPENAI_API_KEY
-        value: your-openai-key
-      - key: DISCORD_TOKEN
-        value: your-discord-token
+envVars:
+  - key: OPENROUTER_API_KEY
+    value: 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
+  - key: DISCORD_TOKEN
+    value: your-discord-token
