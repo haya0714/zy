@@ -1,11 +1,12 @@
 services:
-- type: web
-  name: discord-bot
-  env: python
-  buildCommand: ""
-  startCommand: "python bot.py"
-  envVars:
-    - key: DISCORD_TOKEN
-      value: MTM4...
-    - key: OPENROUTER_API_KEY
-      value: sk-or-v1-7a4e...
+  - type: web
+    name: discord-bot
+    env: python
+    buildCommand: ""
+    startCommand: "python bot.py"
+    envVars:
+      - key: DISCORD_TOKEN
+        value: MTM4...（你的 Token）
+      - key: OPENROUTER_API_KEY
+        value: sk-or-v1-7a4e...（你的 OpenRouter Key）
+      
