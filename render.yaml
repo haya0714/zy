@@ -1,5 +1,6 @@
 envVars:
   - key: OPENROUTER_API_KEY
-    value: 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
+    value: ${OPENROUTER_API_KEY}
+
   - key: DISCORD_TOKEN
-    value: your-discord-token
+    value: ${DISCORD_TOKEN}
