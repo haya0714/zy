@@ -40,30 +40,40 @@ SYSTEM_PROMPT = """
 
 def get_ai_reply(user_input):
     try:
-        key = os.getenv("OPENROUTER_API_KEY")
-        print("🔐 DEBUG API KEY:", key)
+        headers = {
+            "Authorization": f"Bearer {os.getenv('HF_API_KEY')}",
+            "Content-Type": "application/json"
+        }
+
+        prompt = f"{SYSTEM_PROMPT}\n使用者說：「{user_input}」"
+
+        payload = {
+            "inputs": prompt,
+            "parameters": {
+                "max_new_tokens": 128,
+                "temperature": 0.8,
+                "top_p": 0.95,
+                "repetition_penalty": 1.1,
+                "return_full_text": False
+            }
+        }
 
         res = requests.post(
-            "https://openrouter.ai/api/v1/chat/completions",
-            headers={
-                "Authorization": f"Bearer {key}",
-                "Content-Type": "application/json"
-            },
-            json={
-                "model": "deepseek/deepseek-chat-v3:free",
-                "messages": [
-                    {"role": "system", "content": SYSTEM_PROMPT},
-                    {"role": "user", "content": user_input}
-                ]
-            }
+            "https://api-inference.huggingface.co/models/meta-llama/Meta-Llama-3-8B-Instruct",
+            headers=headers,
+            json=payload
         )
-        data = res.json()
-        print("【DEBUG】OpenRouter 回傳：", data)
 
-        if "choices" in data and len(data["choices"]) > 0:
-            return data["choices"][0]["message"]["content"].strip()
+        data = res.json()
+        print("【DEBUG】Hugging Face 回傳：", data)
+
+        if isinstance(data, list) and len(data) > 0 and "generated_text" in data[0]:
+            return data[0]["generated_text"].strip()
+        elif isinstance(data, dict) and "error" in data:
+            return f"……AI 沒有回答（{data['error']}）"
         else:
-            return f"……AI 沒有回答（{data.get('error', '沒有 choices')}）"
+            return "……我懶得理你了。"
+
     except Exception as e:
         print("[錯誤] AI 回覆失敗：", e)
         return "……我懶得回你了。"
