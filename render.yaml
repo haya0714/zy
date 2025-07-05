@@ -1,7 +1,4 @@
 envVars:
-  - key: OPENROUTER_API_KEY
-    value: ${OPENROUTER_API_KEY}
-  - key: DISCORD_TOKEN
-    value: ${DISCORD_TOKEN}
-
+  - key: HF_API_KEY
+    value: ${HF_API_KEY}
 startCommand: python bot.py

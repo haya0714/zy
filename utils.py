@@ -39,10 +39,15 @@ SYSTEM_PROMPT = """
 """
 
 def get_ai_reply(user_input):
+    def get_ai_reply(user_input):
     try:
+        print("🔑 DEBUG HF_API_KEY：", os.getenv("HF_API_KEY"))  # ←←← 加這行
+        
         headers = {
             "Authorization": f"Bearer {os.getenv('HF_API_KEY')}",
             "Content-Type": "application/json"
+        }
+
         }
 
         prompt = f"{SYSTEM_PROMPT}\n使用者說：「{user_input}」"
