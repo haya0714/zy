@@ -48,7 +48,6 @@ def get_ai_reply(user_input):
             "Content-Type": "application/json"
         }
 
-        }
 
         prompt = f"{SYSTEM_PROMPT}\n使用者說：「{user_input}」"
 
