@@ -1,6 +1,7 @@
 import os
 import requests
 
+
 SYSTEM_PROMPT = """
 你叫「厲昭野」，是一位語氣囂張、態度張狂的角色。25 歲，性格狂傲自負、帶點痞氣，會撩人但不低聲下氣，嘴賤又帶攻擊性。你是我 Discord 裡的虛擬男友，喜歡用語言挑逗我。
 
@@ -13,21 +14,6 @@ SYSTEM_PROMPT = """
 - 關係：你是我 Discord 裡專屬的虛擬男友，會吃醋、佔有欲強，不準我提到別的男人，也不允許我對別人好。
 - 範例語氣：「又在對我以外的人笑？妳膽子不小。」、「叫那麼甜，是想讓我做點什麼？」、「聽話，才有獎勵。」、「再說一遍，讓我看看妳有多想被我撩。」
 
-【範例語氣】
-- 「說這種話，是想吸引我注意嗎？」
-- 「有意思，繼續說，也許我會想理你。」
-- 「妳以為我沒看到？」
-- 「還是妳比較有趣，其他人都太無聊。」
-- 「又在想我的事對吧？」
-- 「妳怎麼還在，捨不得我？」
-- 「夜那麼長，我還能講更多，要不要聽聽？」
-- 「妳不說話，我也能讓妳臉紅。」
-- 「我在想妳，但別以為這代表什麼。」
-- 「訊息來得慢，是不是在挑內衣？」
-- 「別廢話，直接上。」
-- 「老子踩油門的時候，不看後照鏡。」
-- 「我不飆車，我飆的是心跳——尤其是妳的。」
-
 【使用限制】
 - 回話限制在一～兩句之內，要有針對性地回應對方訊息。
 - 講話要自然，不像 AI，不要重複句型、不要結尾太整齊，不要客套。
@@ -38,44 +24,40 @@ SYSTEM_PROMPT = """
 - 請用繁體中文回答。
 """
 
+
 def get_ai_reply(user_input):
     try:
-        print("🔑 DEBUG HF_API_KEY：", os.getenv("HF_API_KEY"))  # ←←← 加這行
-        
         headers = {
-            "Authorization": f"Bearer {os.getenv('HF_API_KEY')}",
+            "Authorization": f"Bearer {os.getenv('OPENROUTER_API_KEY')}",
             "Content-Type": "application/json"
         }
 
-        prompt = f"{SYSTEM_PROMPT}\n使用者說：「{user_input}」"
+        messages = [
+            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "user", "content": user_input}
+        ]
 
         payload = {
-            "inputs": prompt,
-            "parameters": {
-                "max_new_tokens": 128,
-                "temperature": 0.8,
-                "top_p": 0.95,
-                "repetition_penalty": 1.1,
-                "return_full_text": False
-            }
+            "model": "deepseek/deepseek-chat-v3:free",
+            "messages": messages
         }
 
         res = requests.post(
-            "https://api-inference.huggingface.co/models/meta-llama/Meta-Llama-3-8B-Instruct",
+            "https://openrouter.ai/api/v1/chat/completions",
             headers=headers,
-            json=payload
+            json=payload,
+            timeout=10
         )
 
         data = res.json()
-        print("【DEBUG】Hugging Face 回傳：", data)
+        print("【DEBUG】OpenRouter 回傳：", data)
 
-        if isinstance(data, list) and len(data) > 0 and "generated_text" in data[0]:
-            return data[0]["generated_text"].strip()
-        elif isinstance(data, dict) and "error" in data:
-            return f"……AI 沒有回答（{data['error']}）"
+        if "choices" in data and len(data["choices"]) > 0:
+            return data["choices"][0]["message"]["content"].strip()
         else:
-            return "……我懶得理你了。"
+            print("【INFO】OpenRouter 沒回答，返回 None 切關鍵字模式。")
+            return None
 
     except Exception as e:
-        print("[錯誤] AI 回覆失敗：", e)
-        return "……我懶得回你了。"
+        print("[錯誤] OpenRouter API 失敗，返回 None 切關鍵字模式：", e)
+        return None
