@@ -191,14 +191,12 @@ async def on_message(message):
 
     if not message.author.bot and channel_id in allowed_channel_ids:
         if openrouter_available:
-            try:
-                ai_reply = get_ai_reply(content)
-                if ai_reply:
-                    await message.reply(ai_reply)
-                    return
-            except Exception as e:
-                print(f"OpenRouter API 失敗，切關鍵詞模式：{e}")
+            ai_reply = get_ai_reply(content)
+            if ai_reply == "OPENROUTER_QUOTA_EXCEEDED":
                 openrouter_offline()
+            elif ai_reply:
+                await message.reply(ai_reply)
+                return
 
         if not openrouter_available:
             for keyword, reply_list in keyword_replies.items():
