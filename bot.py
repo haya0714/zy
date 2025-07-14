@@ -200,7 +200,9 @@ async def on_message(message):
         if openrouter_available:
             try:
                 ai_reply = get_ai_reply(content)
-                if ai_reply:
+                if ai_reply == "OPENROUTER_QUOTA_EXCEEDED":
+                    openrouter_offline()
+                elif ai_reply:
                     await message.reply(ai_reply)
                     return
             except Exception as e:
@@ -299,28 +301,6 @@ async def on_message(message):
             print("⚠️ 加表情出錯：", e)
 
 
-# ─── 背景任務：定時講幹話 ───────────────
-async def random_talk():
-    await bot.wait_until_ready()
-    channel = bot.get_channel(1388500249898913922)
-    if not channel:
-        print("❌ 找不到頻道，請確認頻道 ID 是否正確")
-        return
-    print(f"找到頻道: {channel.name}，準備開始發言")
-    while True:
-        wait_seconds = random.randint(180, 360)
-        print(f"等待 {wait_seconds} 秒後發言")
-        await asyncio.sleep(wait_seconds)
-        try:
-            reply = random.choice(random_responses)
-            print(f"發言: {reply}")
-            await channel.send(reply)
-        except Exception as e:
-            print("發言錯誤：", e)
-            traceback.print_exc()
-
-
-# ─── Flask 健康檢查用 ────────────────────────
 app = Flask(__name__)
 
 @app.route("/")
@@ -332,12 +312,4 @@ def run_web():
 
 Thread(target=run_web).start()
 
-
-# ✅ 這段是新加的，讓 random_talk 正常運作
-@bot.event
-async def setup_hook():
-    bot.loop.create_task(random_talk())
-
-
-# ─── 啟動 Discord Bot ─────────────────
 bot.run(discord_token)
