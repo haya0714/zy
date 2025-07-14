@@ -54,8 +54,7 @@ def get_ai_reply(user_input):
         print("【DEBUG】OpenRouter 回傳：", data)
 
         if "error" in data and data["error"].get("code") == 429:
-            # 額度用完，回傳標記給 bot 處理
-            return "OPENROUTER_QUOTA_EXCEEDED"
+            return None
 
         if "choices" in data and len(data["choices"]) > 0:
             return data["choices"][0]["message"]["content"].strip()
@@ -65,4 +64,4 @@ def get_ai_reply(user_input):
 
     except Exception as e:
         print("[錯誤] OpenRouter API 失敗，返回 None 切關鍵字模式：", e)
-        return "OPENROUTER_QUOTA_EXCEEDED"
+        return None
