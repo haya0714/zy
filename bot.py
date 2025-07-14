@@ -164,19 +164,16 @@ allowed_bot_ids = [1388851358421090384, 1388423986462986270]
 
 openrouter_available = True
 
-
 def openrouter_offline():
     global openrouter_available
     openrouter_available = False
     print("[INFO] OpenRouter 額度用完，切關鍵字模式")
-
 
 @bot.event
 async def on_ready():
     print(f"{bot.user} 已上線！")
     channel = bot.get_channel(1388500249898913922)
     print(f"發話頻道：{channel.name if channel else '找不到頻道！'}")
-
 
 @bot.event
 async def on_message(message):
@@ -190,7 +187,6 @@ async def on_message(message):
     channel_id = message.channel.id
     trigger_matched = False
 
-    # 特定 ID + 特定句
     if message.author.id == 1388203808546361434:
         if channel_id in allowed_channel_ids and any(phrase in content for phrase in [
             "那傢伙不會哄人，只會弄哭人——你這樣靠近他，是在挑釁我嗎？",
@@ -200,7 +196,6 @@ async def on_message(message):
             await message.reply("「怎麼？你不高興？」")
             return
 
-    # ── 正常流程 ──
     if not message.author.bot and channel_id in allowed_channel_ids:
         if openrouter_available:
             try:
@@ -212,7 +207,6 @@ async def on_message(message):
                 print(f"OpenRouter API 失敗，切關鍵詞模式：{e}")
                 openrouter_offline()
 
-        # 生日祝賀
         if "生日快樂" in content and message.mentions:
             mention_name = message.mentions[0].mention
             birthday_intros = [
@@ -238,7 +232,6 @@ async def on_message(message):
             )
             return
 
-        # 禮物梗
         if "禮物呢" in content:
             gift_lines = [
                 "「禮物？妳想要哪種——要我今晚不亂碰妳？還是……乾脆讓我幫妳過個記一輩子的生日？」",
@@ -255,7 +248,6 @@ async def on_message(message):
                 trigger_matched = True
                 break
 
-        # 特定暱稱補捉
         if not trigger_matched:
             if "昭昭" in content:
                 replies = [
@@ -282,12 +274,10 @@ async def on_message(message):
                 await message.reply(random.choice(replies))
                 trigger_matched = True
 
-        # 無特定觸發，隨機回覆
         if not trigger_matched and random.random() < 0.3:
             reply = random.choice(random_responses)
             await message.reply(reply)
 
-    # 隨機加表情
     if random.random() < 0.4:
         try:
             custom_emoji_ids = [
@@ -333,15 +323,12 @@ async def random_talk():
 # ─── Flask 健康檢查用 ────────────────────────
 app = Flask(__name__)
 
-
 @app.route("/")
 def home():
     return "Bot is alive."
 
-
 def run_web():
     app.run(host="0.0.0.0", port=8080)
-
 
 Thread(target=run_web).start()
 
