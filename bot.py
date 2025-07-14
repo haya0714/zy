@@ -345,6 +345,12 @@ def run_web():
 
 Thread(target=run_web).start()
 
+
+# ✅ 這段是新加的，讓 random_talk 正常運作
+@bot.event
+async def setup_hook():
+    bot.loop.create_task(random_talk())
+
+
 # ─── 啟動 Discord Bot ─────────────────
-bot.loop.create_task(random_talk())
 bot.run(discord_token)
