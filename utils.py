@@ -53,6 +53,12 @@ def get_ai_reply(user_input):
         data = res.json()
         print("【DEBUG】OpenRouter 回傳：", data)
 
+        if "error" in data and data["error"].get("code") == 429:
+            # 額度用完，主動通知 bot 切換
+            from bot import openrouter_offline
+            openrouter_offline()
+            return None
+
         if "choices" in data and len(data["choices"]) > 0:
             return data["choices"][0]["message"]["content"].strip()
         else:
@@ -61,4 +67,6 @@ def get_ai_reply(user_input):
 
     except Exception as e:
         print("[錯誤] OpenRouter API 失敗，返回 None 切關鍵字模式：", e)
+        from bot import openrouter_offline
+        openrouter_offline()
         return None

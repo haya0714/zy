@@ -18,6 +18,7 @@ intents = discord.Intents.default()
 intents.message_content = True
 bot = commands.Bot(command_prefix="!", intents=intents)
 
+
 # ─── 隨機回覆語錄（無觸發詞情況下） ───────
 random_responses = [
     "「說這種話，是想吸引我注意嗎？」",
@@ -164,6 +165,12 @@ allowed_bot_ids = [1388851358421090384, 1388423986462986270]
 openrouter_available = True
 
 
+def openrouter_offline():
+    global openrouter_available
+    openrouter_available = False
+    print("[INFO] OpenRouter 額度用完，切關鍵字模式")
+
+
 @bot.event
 async def on_ready():
     print(f"{bot.user} 已上線！")
@@ -191,8 +198,7 @@ async def on_message(message):
                     return
             except Exception as e:
                 print(f"OpenRouter API 失敗，切關鍵詞模式：{e}")
-                openrouter_available = False
-                # 後續改用 keyword 模式
+                openrouter_offline()
 
         if not openrouter_available:
             for keyword, reply_list in keyword_replies.items():
