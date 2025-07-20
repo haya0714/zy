@@ -187,6 +187,22 @@ async def on_message(message):
     channel_id = message.channel.id
     trigger_matched = False
 
+    # 季時安 ID
+    ji_bot_id = 1388851358421090384
+    if message.author.id == ji_bot_id and random.random() < 0.3:
+        ji_reply = random.choice([
+            "「怎麼，又想比誰先下手？」",
+            "「別急，今晚目標我先挑。」",
+            "「你慢吞吞的，還想跟我拼？」",
+            "「派對場上，誰輸誰請，還記得吧？」",
+            "「你那種手法，也只有我看得懂。」",
+            "「賭上今晚的戰績，我可不會讓著你。」",
+            "「別裝正經，你跟我都不是省油的燈。」",
+            "「季時安，你這樣下去，我可要先一步了。」"
+        ])
+        await message.reply(ji_reply)
+        return
+
     if not (
         channel_id in allowed_channel_ids and (
             (not message.author.bot and bot.user in message.mentions)
@@ -297,6 +313,7 @@ async def on_message(message):
                 await message.add_reaction(random.choice(unicode_emojis))
         except Exception as e:
             print("⚠️ 加表情出錯：", e)
+
 
 
 
