@@ -160,7 +160,7 @@ keyword_replies = {
 }
 
 allowed_channel_ids = [1388500249898913922, 1366595410830819328]
-allowed_bot_ids = [1388851358421090384, 1388423986462986270, 1387941916452192437]
+allowed_bot_ids = [1388851358421090384, 1388423986462986270, 1396488192789708800]
 
 openrouter_available = True
 last_replied_bot_id = None  # 防止 BOT → BOT 無限互噴
@@ -308,9 +308,6 @@ async def on_message(message):
                 await message.add_reaction(random.choice(unicode_emojis))
         except Exception as e:
             print("⚠️ 加表情出錯：", e)
-
-
-
 
 app = Flask(__name__)
 
