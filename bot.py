@@ -160,9 +160,10 @@ keyword_replies = {
 }
 
 allowed_channel_ids = [1388500249898913922, 1366595410830819328]
-allowed_bot_ids = [1388851358421090384, 1388423986462986270, 1396488192789708800]
+allowed_bot_ids = [1388851358421090384, 1388423986462986270, 1387941916452192437]
 
 openrouter_available = True
+last_replied_bot_id = None  # 防止 BOT → BOT 無限互噴
 
 def openrouter_offline():
     global openrouter_available
@@ -172,8 +173,13 @@ def openrouter_offline():
 @bot.event
 async def on_message(message):
     global openrouter_available
+    global last_replied_bot_id
 
     if message.author == bot.user:
+        return
+
+    # 防止剛剛才回過同一隻 BOT，又觸發
+    if message.author.bot and message.author.id == last_replied_bot_id:
         return
 
     await bot.process_commands(message)
@@ -184,6 +190,12 @@ async def on_message(message):
     # ======== 分 BOT 跟 玩家關係處理 ========
     is_brother = message.author.bot and message.author.id in allowed_bot_ids
     is_lover = not message.author.bot
+
+    # ======== 更新 BOT 被回覆狀態 ========
+    if message.author.bot and message.author.id in allowed_bot_ids:
+        last_replied_bot_id = message.author.id
+    else:
+        last_replied_bot_id = None
 
     # ========== API 回覆 ==========
     if channel_id in allowed_channel_ids and (
@@ -198,7 +210,7 @@ async def on_message(message):
                 elif ai_reply:
                     # BOT 對 BOT => 兄弟語氣
                     if is_brother:
-                        ai_reply = f"你少裝正經，這局要不是我罩著，你早被人拆了骨頭。……{ai_reply}"
+                        ai_reply = f"兄弟你這樣說……{ai_reply}"
                     await message.reply(ai_reply)
                     return
             except Exception as e:
@@ -296,6 +308,7 @@ async def on_message(message):
                 await message.add_reaction(random.choice(unicode_emojis))
         except Exception as e:
             print("⚠️ 加表情出錯：", e)
+
 
 
 
