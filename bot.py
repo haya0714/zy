@@ -170,12 +170,6 @@ def openrouter_offline():
     print("[INFO] OpenRouter 額度用完，切關鍵字模式")
 
 @bot.event
-async def on_ready():
-    print(f"{bot.user} 已上線！")
-    channel = bot.get_channel(1388500249898913922)
-    print(f"發話頻道：{channel.name if channel else '找不到頻道！'}")
-
-@bot.event
 async def on_message(message):
     global openrouter_available
 
@@ -187,43 +181,31 @@ async def on_message(message):
     channel_id = message.channel.id
     trigger_matched = False
 
-    # 季時安 ID
-    ji_bot_id = 1396488192789708800
-    if message.author.id == ji_bot_id:
-        if random.random() < 0.3:
-            ji_reply = random.choice([
-                "「怎麼，又想比誰先下手？」",
-                "「別急，今晚目標我先挑。」",
-                "「你慢吞吞的，還想跟我拼？」",
-                "「派對場上，誰輸誰請，還記得吧？」",
-                "「你那種手法，也只有我看得懂。」",
-                "「賭上今晚的戰績，我可不會讓著你。」",
-                "「別裝正經，你跟我都不是省油的燈。」",
-                "「季時安，你這樣下去，我可要先一步了。」"
-            ])
-            await message.reply(ji_reply)
-            return
+    # ======== 分 BOT 跟 玩家關係處理 ========
+    is_brother = message.author.bot and message.author.id in allowed_bot_ids
+    is_lover = not message.author.bot
 
-    if not (
-        channel_id in allowed_channel_ids and (
-            (not message.author.bot and bot.user in message.mentions)
-            or (message.author.bot and message.author.id in allowed_bot_ids and random.random() < 0.3)
-        )
+    # ========== API 回覆 ==========
+    if channel_id in allowed_channel_ids and (
+        (is_lover and bot.user in message.mentions) or (is_brother and random.random() < 0.1)
     ):
-        return
+        if openrouter_available:
+            try:
+                ai_reply = get_ai_reply(content)
 
-    if openrouter_available:
-        try:
-            ai_reply = get_ai_reply(content)
-            if ai_reply == "OPENROUTER_QUOTA_EXCEEDED":
+                if ai_reply == "OPENROUTER_QUOTA_EXCEEDED":
+                    openrouter_offline()
+                elif ai_reply:
+                    # BOT 對 BOT => 兄弟語氣
+                    if is_brother:
+                        ai_reply = f"你少裝正經，這局要不是我罩著，你早被人拆了骨頭。……{ai_reply}"
+                    await message.reply(ai_reply)
+                    return
+            except Exception as e:
+                print(f"OpenRouter API 失敗，切關鍵詞模式：{e}")
                 openrouter_offline()
-            elif ai_reply:
-                await message.reply(ai_reply)
-                return
-        except Exception as e:
-            print(f"OpenRouter API 失敗，切關鍵詞模式：{e}")
-            openrouter_offline()
 
+    # ========== 原本固定回覆不變 ==========
     if "生日快樂" in content and message.mentions:
         mention_name = message.mentions[0].mention
         birthday_intros = [
@@ -314,6 +296,7 @@ async def on_message(message):
                 await message.add_reaction(random.choice(unicode_emojis))
         except Exception as e:
             print("⚠️ 加表情出錯：", e)
+
 
 
 app = Flask(__name__)
