@@ -68,7 +68,7 @@ def get_ai_reply(user_input, system_prompt):
 
         payload = {
             # 如果你想要更好的模型，可以考慮 gemma-2-9b-it, claude-3.5-sonnet 等
-            "model": "meta-llama/llama-3-8b-instruct:free", 
+            "model": "mistralai/mixtral-8x7b-instruct", 
             "messages": messages
         }
 
