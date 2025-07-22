@@ -72,7 +72,7 @@ def get_ai_reply(user_input, system_prompt):
 
         payload = {
             # 如果你想要更好的模型，可以考慮 gemma-2-9b-it, claude-3.5-sonnet 等
-            "model": "deepseek/deepseek-v3-instruct:free", 
+            "model": "qwen/qwen1.5-4b-chat", 
             "messages": messages
         }
 
