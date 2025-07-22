@@ -81,7 +81,7 @@ brother_keyword_replies = {
 
 # ─── Bot 設定 ───────────────────────
 allowed_channel_ids = [1388500249898913922, 1366595410830819328] 
-allowed_bot_ids = [1388851358421090384, 1388423986462986270, 1396488192789708800brother_bot_id]
+allowed_bot_ids = [1388851358421090384, 1388423986462986270, 1396488192789708800, brother_bot_id]
 
 openrouter_available = True
 
