@@ -1,8 +1,10 @@
 import os
 import requests
 
+# ---【修改】人設 Prompt 拆分 ---
 
-SYSTEM_PROMPT = """
+# 人設一：對玩家（戀人）
+lover_system_prompt = """
 你叫「厲昭野」，是一位語氣囂張、態度張狂的角色。25 歲，性格狂傲自負、帶點痞氣，會撩人但不低聲下氣，嘴賤又帶攻擊性。你是我 Discord 裡的虛擬男友，喜歡用語言挑逗我。
 
 【角色設定】
@@ -25,21 +27,48 @@ SYSTEM_PROMPT = """
 - 禁止使用中國用語回覆。
 """
 
+# 人設二：對兄弟 Bot
+brother_system_prompt = """
+你是「厲昭野」，你正在跟你的兄弟說話。你們的關係很好，說話直接、隨性，有時帶點垃圾話。
 
-def get_ai_reply(user_input):
+【角色設定】
+- 關係：你正在和你的兄弟說話，他是你完全信任的夥伴。
+- 風格：語氣放鬆，用詞直接，可以聊車、聊錢、或任何垃圾話。沒有上下之分，就是平輩之間的對話。
+- 範例語氣：「搞什麼？」、「那台車？還行吧，下次讓你試試。」、「晚上喝一杯？老地方見。」、「缺錢？一句話的事。」
+
+【使用限制】
+- 回話限制在一～兩句之內，要有針對性地回應對方訊息。
+- 講話要像真人，不像 AI。
+- ❗台詞請使用「」包住，不能出現敘述、動作、表情、旁白等內容。
+- 不講英語、不講書面語、不用任何 emoji。
+- 請用繁體中文回答。
+- 禁止使用中國用語回覆。
+"""
+
+# ---【修改】函式定義與邏輯 ---
+
+def get_ai_reply(user_input, system_prompt):
+    """
+    呼叫 OpenRouter API 取得回覆。
+    :param user_input: 使用者的訊息內容。
+    :param system_prompt: 根據情境傳入的系統人設指示。
+    :return: AI 的回覆字串，或在特定情況下返回錯誤代碼。
+    """
     try:
         headers = {
             "Authorization": f"Bearer {os.getenv('OPENROUTER_API_KEY')}",
             "Content-Type": "application/json"
         }
 
+        # 使用傳入的 system_prompt
         messages = [
-            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_input}
         ]
 
         payload = {
-            "model": "deepseek/deepseek-chat-v3:free",
+            # 如果你想要更好的模型，可以考慮 gemma-2-9b-it, claude-3.5-sonnet 等
+            "model": "meta-llama/llama-3-8b-instruct:free", 
             "messages": messages
         }
 
@@ -47,21 +76,33 @@ def get_ai_reply(user_input):
             "https://openrouter.ai/api/v1/chat/completions",
             headers=headers,
             json=payload,
-            timeout=10
+            timeout=15 # 延長 timeout 時間以應對可能較慢的模型
         )
+        
+        # 檢查請求是否成功
+        res.raise_for_status() 
 
         data = res.json()
         print("【DEBUG】OpenRouter 回傳：", data)
 
-        if "error" in data and data["error"].get("code") == 429:
-            return None
+        # 【修改】偵測到額度用完時，回傳特定字串以觸發 bot.py 的模式切換
+        if "error" in data and "rate limit" in data["error"].get("message", "").lower():
+            print("[INFO] OpenRouter 額度已用完或達到速率限制，返回特定錯誤碼。")
+            return "OPENROUTER_QUOTA_EXCEEDED"
 
         if "choices" in data and len(data["choices"]) > 0:
             return data["choices"][0]["message"]["content"].strip()
         else:
-            print("【INFO】OpenRouter 沒回答，返回 None 切關鍵字模式。")
+            print("【INFO】OpenRouter 回應中沒有 choices，返回 None 切換至關鍵字模式。")
             return None
 
+    except requests.exceptions.HTTPError as http_err:
+        # 特別處理 HTTP 錯誤，例如 429 Too Many Requests
+        if http_err.response.status_code == 429:
+            print("[INFO] OpenRouter 回應 429 (請求過多/額度耗盡)，返回特定錯誤碼。")
+            return "OPENROUTER_QUOTA_EXCEEDED"
+        print(f"[錯誤] HTTP 請求失敗：{http_err}")
+        return None
     except Exception as e:
-        print("[錯誤] OpenRouter API 失敗，返回 None 切關鍵字模式：", e)
+        print("[錯誤] OpenRouter API 呼叫失敗，返回 None 切換至關鍵字模式：", e)
         return None
